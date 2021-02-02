@@ -11,7 +11,7 @@
     "type": "git",
     "url": "git+https://github.com/ming-young/fetch.git"
   },
-  "keywords": [],
+  "keywords": ["vue","fetch", "fetch-vue"],
   "author": "ming-young",
   "license": "ISC",
   "bugs": {
