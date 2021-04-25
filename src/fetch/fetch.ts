@@ -6,7 +6,8 @@ const CancelToken = axios.CancelToken
 const source = CancelToken.source()
 
 interface Config extends AxiosRequestConfig {
-  options?: object
+  /** 用户自定义配置, 最终会合并到 原始 config 当中 */
+  options?: {[key:string] :any}
   beforeRequest?: (config: AxiosRequestConfig, customConfig: Config) => Config | null
   requestError?: (error: any, customConfig: Config) => any
   beforeResponse?: (response: AxiosResponse, customConfig: Config, responseConfig:AxiosRequestConfig) => AxiosResponse
