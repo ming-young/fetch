@@ -14,7 +14,7 @@
    import Fetch from 'fetch-vue'
    
    const fetch = new Fetch({
-     baseURL: 'https://httpapi-dev.shinho.net.cn/ka-budget/',
+     baseURL: 'https://httpapi-dev.xxxx.net.cn/ka-budget/',
      timeout: 30000,
      // 请求头
      headers: {
@@ -83,7 +83,7 @@
 
    ```javascript
    const data = await fetch.post('user/login',
-           {userId: '18040108', password: 'P0tIEdrk4Hy21+rEIiwpLA==', key: 'PURLEwtuvcDXNZjF'},
+           {userId: 'ming', password: 'P0tIEdrk4Hy21+rEIiwpLA==', key: 'PURLEwtuvcDXNZjF'},
            {quite: true,
              headers: {
                /** 自定义 header 信息 */

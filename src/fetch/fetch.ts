@@ -1,18 +1,45 @@
 
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse, Method, AxiosPromise } from 'axios'
 import { has } from './utils'
 
 const CancelToken = axios.CancelToken
 const source = CancelToken.source()
 
-interface Config extends AxiosRequestConfig {
+export interface Config extends AxiosRequestConfig {
   /** 用户自定义配置, 最终会合并到 原始 config 当中 */
-  options?: {[key:string] :any}
+  options?: {[key:string] :unknown}
+  /**
+   * 请求发送之前的拦截方法, 可以获取指定的配置, 对当前请求自定义修改
+   *
+   * @memberof Config 合并之后的 config
+   * @memberof customConfig 用户自定义的config
+   * @return 当前请求最终需要的config
+   */
   beforeRequest?: (config: AxiosRequestConfig, customConfig: Config) => Config | null
-  requestError?: (error: any, customConfig: Config) => any
+  /**
+   * 请求错误
+   * @memberof error 请求抛出的错误
+   * @memberof Config 当前请求的 config
+   * @return 需要抛出的具体返回值
+   */
+  requestError?: (error: unknown, config: Config) => unknown
+  /**
+   * 请求返回之后的拦截方法, 可以修改返回的内容或者配置具体的业务逻辑
+   * @memberof response 返回值
+   * @memberof Config 合并之后的 config
+   * @memberof customConfig 用户自定义的config
+   * @return 当前请求最终需要的config
+   */
   beforeResponse?: (response: AxiosResponse, customConfig: Config, responseConfig:AxiosRequestConfig) => AxiosResponse
-  responseError?: (error: any, customConfig: Config) => any
+  /**
+   * 请求错误
+   * @memberof error 请求返回错误
+   * @memberof config 当前请求的 config
+   * @return 需要抛出的具体返回值
+   */
+  responseError?: (error: unknown, config: Config) => unknown
 }
+
 // AxiosRequestConfig
 
 export default class Fetch {
@@ -25,45 +52,47 @@ export default class Fetch {
     this.initIntercept()
   }
 
-  get (url: string, config:object, options:object = {}) {
-    const configs = this.constructArgs(['GET', url, config, options])
+  get<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}) :AxiosPromise<T> {
+    const configs = this.constructArgs('GET', url, params, options)
     return this.fetchInstance(configs)
   }
 
-  post (url: string, config:object, options:object = {}) {
-
-    const configs = this.constructArgs(['POST', url, config, options])
+  post<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<T | null> {
+    debugger
+    const configs = this.constructArgs('POST', url, params, options)
     return this.fetchInstance(configs)
   }
 
-  put (url: string, config:object, options:object = {}) {
-    const configs = this.constructArgs(['PUT', url, config, options])
+  put (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+    const configs = this.constructArgs('PUT', url, params, options)
     return this.fetchInstance(configs)
   }
 
-  delete (url: string, config:object, options:object = {}) {
-    const configs = this.constructArgs(['DELETE', url, config, options])
+  delete (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+    const configs = this.constructArgs('DELETE', url, params, options)
     return this.fetchInstance(configs)
   }
 
-  fetch (url: string, config:object, options:object = {}) {
-    const configs = this.constructArgs(['GET', url, config, options])
+  fetch (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+    const configs = this.constructArgs('GET', url, params, options)
     return this.fetchInstance(configs)
   }
 
   // 取消请求
-  cancel (message:string | undefined) {
+  cancel (message:string | undefined):void {
     return source.cancel(message)
   }
 
   // 判断请求错误是否是取消
-  isCancel (err:any) {
+  isCancel (err:unknown):boolean {
     return axios.isCancel(err)
   }
 
   // Vue注入
-  install (Vue:any, options: {version: number } = { version: 2 }) {
-    if (options.version >= 3) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  install (Vue:any, options: {version: number } = { version: 2 }): void {
+    if (options.version >= 3 || parseFloat(Vue.version) >= 3) {
       Vue.config.globalProperties.$get = this.get.bind(this)
       Vue.config.globalProperties.$post = this.post.bind(this)
       Vue.config.globalProperties.$put = this.put.bind(this)
@@ -80,18 +109,20 @@ export default class Fetch {
     }
   }
 
+  // this.constructArgs(['GET', url, config, options])
   // 构建参数
-  constructArgs (args:Array<object | string>) {
+  // constructArgs (args:Array<Config | string>): Config {
+  constructArgs (method: Method, url:string, params: unknown, options:{[key:string] :unknown} = {}): Config {
     // [{ url, method, options }]
     let config:Config = {}
 
-    config.method = args[0] as Method
-    config.url = args[1] as string
-    config.options = args[3] as object || {}
+    config.method = method
+    config.url = url
+    config.options = options
     if (has('get,delete', config.method?.toLowerCase())) {
-      config.params = args[2]
+      config.params = params
     } else {
-      config.data = args[2]
+      config.data = params
     }
 
     // 合并用户设置
@@ -103,7 +134,7 @@ export default class Fetch {
   }
 
   // 初始化拦截器
-  initIntercept () {
+  initIntercept () :void{
     /**
    * 请求拦截器
    * 可作用请求前修改请求配置
