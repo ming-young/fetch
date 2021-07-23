@@ -15,30 +15,47 @@ export default class Fetch {
     this.initIntercept()
   }
 
-  get<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}) :AxiosPromise<T> {
-    const configs = this.constructArgs('GET', url, params, options)
-    return this.fetchInstance(configs)
+  /** 将返回值 转换成 可支持任意类型的promise */
+  translateToPromise<T> (instance:AxiosPromise<any>): Promise<T> {
+    const p = new Promise<T>((resolve, reject) => {
+      instance.then(res => {
+        resolve(res as any)
+      })
+      instance.catch(e => {
+        reject(e)
+      })
+    })
+    return p
   }
 
-  post<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<T | null> {
-    debugger
+  get<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}) :Promise<T | null> {
+    const configs = this.constructArgs('GET', url, params, options)
+    const instance = this.fetchInstance(configs)
+    return this.translateToPromise<T>(instance)
+  }
+
+  post<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):Promise<T | null> {
     const configs = this.constructArgs('POST', url, params, options)
-    return this.fetchInstance(configs)
+    const instance = this.fetchInstance(configs)
+    return this.translateToPromise<T>(instance)
   }
 
-  put (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+  put<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):Promise<T | null> {
     const configs = this.constructArgs('PUT', url, params, options)
-    return this.fetchInstance(configs)
+    const instance = this.fetchInstance(configs)
+    return this.translateToPromise<T>(instance)
   }
 
-  delete (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+  delete<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):Promise<T | null> {
     const configs = this.constructArgs('DELETE', url, params, options)
-    return this.fetchInstance(configs)
+    const instance = this.fetchInstance(configs)
+    return this.translateToPromise<T>(instance)
   }
 
-  fetch (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):AxiosPromise<unknown> {
+  fetch<T> (url: string, params:{ [key: string]: unknown } | string | number, options:{ [key: string]: unknown } = {}):Promise<T | null> {
     const configs = this.constructArgs('GET', url, params, options)
-    return this.fetchInstance(configs)
+    const instance = this.fetchInstance(configs)
+    return this.translateToPromise<T>(instance)
   }
 
   // 取消请求
