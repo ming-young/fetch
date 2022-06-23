@@ -32,9 +32,9 @@
       * @param {object} config 合并之后的配置
       * @param {object} customConfig 用户自定义配置
       */
-     beforeRequest (config, customConfig) {
+     beforeRequest (config) {
        /** config 中 能够获取到 接口请求时 自定义传入的 options, 在这里可以处理对应的需求 */
-       console.log('beforeRequest', config.options, customConfig)
+       console.log('beforeRequest', config)
        return config
      },
      /**

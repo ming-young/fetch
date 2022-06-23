@@ -123,7 +123,7 @@ export default class Fetch {
     this.fetchInstance.interceptors.request.use(
       (config) => {
         if (this.config.beforeRequest) {
-          const conf = this.config.beforeRequest(config, this.config)
+          const conf = this.config.beforeRequest(config)
           return conf || config
         } else {
           return config
@@ -147,7 +147,7 @@ export default class Fetch {
     this.fetchInstance.interceptors.response.use(
       (response) => {
         if (this.config.beforeResponse) {
-          return this.config.beforeResponse(response, this.config, response.config)
+          return this.config.beforeResponse(response, response.config)
         } else {
           return response
         }

@@ -12,10 +12,9 @@ export interface Config extends AxiosRequestConfig {
    * 请求发送之前的拦截方法, 可以获取指定的配置, 对当前请求自定义修改
    *
    * @memberof Config 合并之后的 config
-   * @memberof customConfig 用户自定义的config
    * @return 当前请求最终需要的config
    */
-  beforeRequest?: (config: AxiosRequestConfig, customConfig: Config) => Config | null
+  beforeRequest?: (config: AxiosRequestConfig) => Config | null
   /**
    * 请求错误
    * @memberof error 请求抛出的错误
@@ -30,7 +29,7 @@ export interface Config extends AxiosRequestConfig {
    * @memberof customConfig 用户自定义的config
    * @return 当前请求最终需要的config
    */
-  beforeResponse?: (response: AxiosResponse, customConfig: Config, responseConfig:AxiosRequestConfig) => AxiosResponse
+  beforeResponse?: (response: AxiosResponse, customConfig: Config) => AxiosResponse
   /**
    * 请求错误
    * @memberof error 请求返回错误

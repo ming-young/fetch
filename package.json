@@ -1,6 +1,6 @@
 {
   "name": "fetch-vue",
-  "version": "1.0.4-2",
+  "version": "1.0.4-3",
   "description": "",
   "main": "lib/index.js",
   "scripts": {
